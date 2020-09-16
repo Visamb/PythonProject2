@@ -8,7 +8,7 @@ from OptimizationProblem import*
 from QuasiNewton import*
 
 def testfunction(x):
-    value = sin(x[0]) + sin(x[1])
+    value = sin(x[0]) + 4*sin(x[1])
     return value
 def testgradient(x):
     grad = cos(x[0])+cos(x[1])

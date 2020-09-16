@@ -3,10 +3,10 @@ from numpy import *
 class QuasiNewton:
 
     def __init__(self,problem):
-        self.epsilon = 0.0001  # step size
+        self.epsilon = 0.00001  # step size
         self.f = problem.function# object function
         self.n = 2  # the dimension of the domain, R^n
-        self.alpha = 1
+        self.alpha = 0.1
 
     def gradient(self, x):
      """
@@ -51,17 +51,13 @@ class QuasiNewton:
         """
 
         inverse_hessian = linalg.inv(self.hessian(x))
-        print("Inverse HEss")
-        print(inverse_hessian)
+
         g = self.gradient(x)
-        print("Gradient")
-        print(g)
 
         newton_direction = inverse_hessian.dot(g)# The Newton direction determines step direction.
-        print(newton_direction)
-        print("NEW")
 
-        new_coordinates = x-newton_direction
+
+        new_coordinates = x-self.alpha*newton_direction
         return new_coordinates
 
     def newHessian():
@@ -84,13 +80,14 @@ class QuasiNewton:
         :return: boolean that is true if criteria are fulfilled
         """
         Hess = self.hessian(x)
-        if self.gradient(x).all() != 0.00:
+        if not all(self.gradient(x) == 0):
             return False
-        else:
+        """else:
             try:
+                print(Hess)
                 linalg.cholesky(Hess)
             except:
-                return False #If the Choleskymethod gives error False is returned.
+                return False #If the Choleskymethod gives error False is returned."""
 
         print("SOLVED!")
         return True
@@ -107,7 +104,7 @@ class QuasiNewton:
             value = newvalue
             solved = self.termination_criterion(value)
             values = [values, value]
-        return value
+        return [value, self.f(value)]
 
 
 
