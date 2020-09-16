@@ -18,7 +18,6 @@ class QuasiNewton:
             e = zeros((self.n, 1))  # unit vectors in the domain
             e[i] = self.epsilon  # we want to take a step in the i:th direction
             g[i] = (self.f(x + e) - self.f(x)) / self.epsilon  # (8.1) at p.195
-
      return g
 
     def hessian(self, x):
@@ -33,8 +32,6 @@ class QuasiNewton:
                 direction2 = zeros((self.n,1))
                 direction1[i] = self.epsilon
                 direction2[j] = self.epsilon
-                direction2 = direction1 - direction1[j]
-                direction3 = direction1 - direction1[i]
                 G[i,j] = (self.f(x + direction1 + direction2) - self.f(x+direction2) - self.f(x+direction1) + self.f(x))/(self.epsilon**2)
         G = (G + G.transpose())/2
         return G
