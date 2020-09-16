@@ -17,7 +17,7 @@ class QuasiNewton:
      for i in range(self.n):  # for every coordinate of x
             e = zeros((self.n, 1))  # unit vectors in the domain
             e[i] = self.epsilon  # we want to take a step in the i:th direction
-            g[i] = (self.f(x + e) - self.f(x)) / self.epsilon  # (8.1) at p.195
+            g[i] = (self.f(x + e) - self.f(x - e)) / (2*self.epsilon)  # (8.1) at p.195
      return g
 
     def hessian(self, x):
@@ -49,10 +49,18 @@ class QuasiNewton:
         Computes coordinates for the next step in accordance with the Quasi Newton procedure.
         :return: (array)
         """
+
         inverse_hessian = linalg.inv(self.hessian(x))
+        print("Inverse HEss")
+        print(inverse_hessian)
         g = self.gradient(x)
+        print("Gradient")
+        print(g)
+
         newton_direction = inverse_hessian.dot(g)# The Newton direction determines step direction.
         print(newton_direction)
+        print("NEW")
+
         new_coordinates = x-newton_direction
         return new_coordinates
 
