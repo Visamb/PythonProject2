@@ -70,7 +70,7 @@ class QuasiNewton:
 
     def termination_criterion(self,x):
         """
-        Asserts that the criterions for optimum are fulfilled. The criterions are:
+        Asserts that the criteria for optimum are fulfilled. The criteria are:
         1.Hessian is symmetric and positive definite.
         2. The gradient is zero.
         :return: boolean that is true if criteria are fulfilled
