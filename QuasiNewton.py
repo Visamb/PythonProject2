@@ -3,7 +3,7 @@ from numpy import *
 class QuasiNewton:
 
     def __init__(self,problem):
-        self.epsilon = 0.001  # step size
+        self.epsilon = 0.01  # step size
         self.f = problem.function# object function
         self.n = 2  # the dimension of the domain, R^n
         self.alpha = 1
@@ -83,10 +83,10 @@ class QuasiNewton:
         if self.gradient(x).all() == 0:
             return True
 
-    def solve(self):
-        x = zeros((2,1))
-        x[0] = 0
-        x[1] = 0
+    def solve(self,dimension):
+
+        expected_dimension = dimension
+        x = zeros((expected_dimension,1))
         solved = self.termination_criterion(x)
         value = x
         values = [value]

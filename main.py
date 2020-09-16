@@ -14,10 +14,13 @@ def testgradient(x):
     grad = cos(x[0])+cos(x[1])
     return grad
 
+x0 = zeros((3,1))
+fval = testfunction(x0)
+print(fval)
 
 problem = OptimizationProblem(testfunction,testgradient)
 solution = QuasiNewton(problem)
-a = solution.solve()
+a = solution.solve(2)
 print(a)
 
 
