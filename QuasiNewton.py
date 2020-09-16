@@ -64,9 +64,20 @@ class QuasiNewton:
         """Returns Hessian. Overridden in 9 special methods"""
         return
 
-    def exactlinesearch():
-        """Defines exact line search"""
-        return 1
+     def exactlinesearch(self, x):
+        """
+        Exact line search method as described in (3.3) p.31 Nocedal, Wright
+        :param x:
+        :return:
+        """
+        direct = self.newton_direction(x)
+
+        alphas = linspace(0, 2, 10)
+        for alpha in alphas:
+            graddarray = self.gradd(x-alpha*direct)
+            if all(graddarray < 0.001):
+                return alpha
+        raise exception("NO ALPHA FOUND")
 
     def inexactlinesearch():
         """Defines inexact linesearch"""
