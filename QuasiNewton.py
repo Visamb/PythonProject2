@@ -7,10 +7,10 @@ from linesearchmethods import exact_linesearch, inexact_linesearch
 class QuasiNewton:
 
     def __init__(self, problem, lsm="inexact"):
-        self.epsilon = 0.0001      # step size
+        self.epsilon = 0.001      # step size
         self.f = problem.function  # object function
         self.n = 2                 # the dimension of the domain, R^n
-        self.alpha = 1             #
+        self.alpha = 5             #
         self.values = array([])    #
         self.TOL = 1.e-8           # tolerance for the 0-element
 
@@ -104,23 +104,24 @@ class QuasiNewton:
         if not all(self.gradient(x) < self.TOL):
             return False
 
-        """else:
+        else:
             try:
                 linalg.cholesky(Hess)
+                print("POSITIVE DEFINITE AND SYMMETRIC")
             except:
-                return False  # If the Choleskymethod gives error False is returned."""
+                return False  # If the Choleskymethod gives error False is returned.
 
         print("SOLVED!")
         return True
 
     def solve(self):
-        x = ones((self.n, 1)) * 2
+        x = ones((self.n, 1)) * 4
         solved = self.termination_criterion(x)
         value = x
+        self.alpha = self.linesearch(value)
+        print(self.alpha)
         self.values = value
         while solved is False:
-            self.alpha = self.linesearch(value)
-            print(self.alpha)
             newvalue = self.newstep(value)
             value = newvalue
             solved = self.termination_criterion(value)
