@@ -1,6 +1,7 @@
 """Generic class for QuasiNewton"""
 from numpy import *
-from math import inf
+from math import *
+from linesearchmethods import*
 
 
 class QuasiNewton:
@@ -9,7 +10,7 @@ class QuasiNewton:
         self.epsilon = 0.0001      # step size
         self.f = problem.function  # object function
         self.n = 2                 # the dimension of the domain, R^n
-        self.alpha = 0.01             #
+        self.alpha = 1             #
         self.values = array([])    #
         self.TOL = 1.e-8           #
         self.rho = 0.1
@@ -166,12 +167,13 @@ class QuasiNewton:
 
     def solve(self):
         x = ones((self.n, 1)) * 2
-        self.alpha = self.inexactlinesearch(self.f,x,self.alpha,self.newton_direction(x),self.rho,self.sigma,self.tau,self.xi)
+        self.alpha = inexact_linesearch(self.f,self.newton_direction(x),x,self.rho,self.sigma,self.tau,self.xi)
+
         solved = self.termination_criterion(x)
         value = x
         self.values = value
         while solved is False:
-            self.alpha = self.inexactlinesearch(self.f, x, self.alpha, self.newton_direction(x), self.rho, self.sigma, self.tau, self.xi)
+            self.alpha = inexact_linesearch(self.f, self.newton_direction(x), x, self.rho, self.sigma, self.tau, self.xi)
             newvalue = self.newstep(value)
             value = newvalue
             solved = self.termination_criterion(value)

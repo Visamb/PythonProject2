@@ -2,6 +2,7 @@ from numpy import *
 from OptimizationProblem import*
 import matplotlib.pyplot as plt
 from QuasiNewton import*
+from linesearchmethods import inexact_linesearch
 
 
 def rosenbrock(x):
@@ -50,8 +51,22 @@ def gradient(x):
     return grad
 
 
-problem = OptimizationProblem(rosenbrock, gradient)
+def task7():
+    x = array([[0],
+               [3]])
+    rho = 0.1
+    sigma = 0.7
+    tau = 0.1
+    chi = 9
+    problem = OptimizationProblem(rosenbrock)
+    method = QuasiNewton(problem)
+    s = method.gradient(x)
+    res = inexact_linesearch(rosenbrock, x, s, rho, sigma, tau, chi)
+
+
+problem = OptimizationProblem(rosenbrock)
 solution = QuasiNewton(problem)
 min_point, min_value = solution.solve()
+print(min_point)
 optipoints = solution.values
 contour_rosenbrock(optipoints=optipoints)
