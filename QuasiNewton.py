@@ -1,6 +1,6 @@
 """Generic class for QuasiNewton"""
 from logging import exception
-
+import matplotlib.pyplot as plt
 from numpy import *
 class QuasiNewton:
 
@@ -10,6 +10,8 @@ class QuasiNewton:
         self.gradd = problem.gradient
         self.n = 2  # the dimension of the domain, R^n
         self.alpha = 1
+        self.TOL = 1e-8
+        self.values = array([])
 
     def gradient(self, x):
      """
@@ -21,6 +23,7 @@ class QuasiNewton:
             e = zeros((self.n, 1))  # unit vectors in the domain
             e[i] = self.epsilon  # we want to take a step in the i:th direction
             g[i] = (self.f(x + e) - self.f(x - e)) / (2*self.epsilon)  # (8.1) at p.195
+
      return g
 
     def hessian(self, x):
@@ -76,9 +79,9 @@ class QuasiNewton:
         """
         direct = self.newton_direction(x)
 
-        alphas = linspace(1, 0, 10)
+        alphas = linspace(2, 0, 100000)
         for alpha in alphas:
-            graddarray = self.gradd(x-alpha*direct)
+            graddarray = self.gradient(x-alpha*direct)
             if all(graddarray < 0.01):
                 return alpha
         raise exception("NO ALPHA FOUND")
@@ -96,7 +99,7 @@ class QuasiNewton:
         :return: boolean that is true if criteria are fulfilled
         """
         Hess = self.hessian(x)
-        if not all(self.gradient(x) == 0):
+        if not all(self.gradient(x) < self.TOL ):
             return False
         """else:
             try:
@@ -109,20 +112,25 @@ class QuasiNewton:
         return True
 
     def solve(self):
-        x = zeros((2,1))
-        x[0] = 1
-        x[1] = 1
-        self.alpha = self.exactlinesearch(x)
+        x = ones((self.n,1))*2
+        #self.alpha = self.exactlinesearch(x)
         solved = self.termination_criterion(x)
         value = x
-        values = [value]
+        self.values = value
+
+
+        print(shape(self.values))
         while solved is False:
-            self.alpha = self.exactlinesearch(value)
+            #self.alpha = self.exactlinesearch(value)
             newvalue = self.newstep(value)
             value = newvalue
             solved = self.termination_criterion(value)
-            values = [values, value]
+            self.values = hstack((self.values,value))
+
+        #plt.scatter(self.values[0], self.values[1])
+
         return [value, self.f(value)]
+
 
 
 
