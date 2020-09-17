@@ -1,12 +1,15 @@
 """Generic class for QuasiNewton"""
+from logging import exception
+
 from numpy import *
 class QuasiNewton:
 
     def __init__(self,problem):
         self.epsilon = 0.00001  # step size
         self.f = problem.function# object function
+        self.gradd = problem.gradient
         self.n = 2  # the dimension of the domain, R^n
-        self.alpha = 0.1
+        self.alpha = 1
 
     def gradient(self, x):
      """
@@ -38,10 +41,11 @@ class QuasiNewton:
 
     def newton_direction(self,x):
         """INTE ANVÄND ÄN. VET EJ OM VI KOMMER BEHÖVA DENNA SOM METOD"""
-        inverse_hessian = self.hessian(x)
+        inverse_hessian = linalg.inv(self.hessian(x))
+
         g = self.gradient(x)
-        newton_direction = inverse_hessian*g
-        print(newton_direction)
+
+        newton_direction = inverse_hessian.dot(g)
         return newton_direction
 
     def newstep(self,x):
@@ -64,7 +68,7 @@ class QuasiNewton:
         """Returns Hessian. Overridden in 9 special methods"""
         return
 
-     def exactlinesearch(self, x):
+    def exactlinesearch(self, x):
         """
         Exact line search method as described in (3.3) p.31 Nocedal, Wright
         :param x:
@@ -72,12 +76,13 @@ class QuasiNewton:
         """
         direct = self.newton_direction(x)
 
-        alphas = linspace(0, 2, 10)
+        alphas = linspace(1, 0, 10)
         for alpha in alphas:
             graddarray = self.gradd(x-alpha*direct)
-            if all(graddarray < 0.001):
+            if all(graddarray < 0.01):
                 return alpha
         raise exception("NO ALPHA FOUND")
+
 
     def inexactlinesearch():
         """Defines inexact linesearch"""
@@ -107,10 +112,12 @@ class QuasiNewton:
         x = zeros((2,1))
         x[0] = 1
         x[1] = 1
+        self.alpha = self.exactlinesearch(x)
         solved = self.termination_criterion(x)
         value = x
         values = [value]
         while solved is False:
+            self.alpha = self.exactlinesearch(value)
             newvalue = self.newstep(value)
             value = newvalue
             solved = self.termination_criterion(value)
