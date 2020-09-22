@@ -114,17 +114,42 @@ def newton_methods(problem=None):
     # contour_rosenbrock(optipoints=optipoints)  # uncomment to plot rosenbrock_contour and optimization points"""
 
 
-def chebyquadt():
-    problem = OptimizationProblem(chebyquad,dimension =4,lsm="inexact")
-    solution = BFGS(problem, lsm = "inexact")
-    a = solution.solve()
+def chebyquadtest():
 
-    min2 = opt.fmin(chebyquad, ones((4, 1)) * 1)
-    print(min2)
+    degree = input("Testing mimimization of the Chebyquad function of degree n. Choose degree n: ")
+    degree = int(degree)
 
+    method = input(
+        "Testing Newton methods, choose one of the following:\n\t\'newton\', \'goodBroyden\', \'badBroyden\', \'symmetricBroyden\', \'DFP\', \'BFGS\'\nMethod: ")
 
+    # Check that the chosen method is valid
+    valid_methods = {"newton": Newton, "goodBroyden": GoodBroyden, "badBroyden": BadBroyden
+        , "symmetricBroyden": SymmetricBroyden, "DFP": DFP, "BFGS": BFGS}
+    while method not in valid_methods:
+        print(
+            "\nMethod \'{}\' does not exist, choose one of the following:\n\t\'newton\', \'goodBroyden\', \'badBroyden\', \'symmetricBroyden\', \'DFP\', \'BFGS\'".format(
+                method))
+        method = input("Method: ")
 
-    print(a)
+    problem = OptimizationProblem(chebyquad,dimension =degree,lsm="inexact")
+    solver = valid_methods[method](problem, lsm = "inexact")
+    a = solver.solve()
+
+    print()
+    print("Optimizing the Chebyquad function of degree n = " + str(degree) + " with a " + str(method) + "-method: ")
+    print("Function value: " + str(a[1]))
+    print("The minimum was found in: " + str(transpose(a[0])))
+    print()
+    print("Optimizing the same function with numpy.optimize.fmin: ")
+    min2 = opt.fmin_bfgs(chebyquad, ones((degree, 1)) * 1, disp=False, full_output=True)
+    print("Function value: " + str(min2[1]))
+    print("The minimum was found in: " + str(min2[0]))
+    print()
+
+    if isclose(min2[0],transpose(a[0])).all() and isclose(min2[1],a[1]):
+        print("The two methods yield the same result.")
+    else:
+        print("The two methods do NOT yield the same result.")
 
 
 
