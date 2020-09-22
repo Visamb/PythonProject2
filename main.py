@@ -1,11 +1,14 @@
 from numpy import *
-from OptimizationProblem import*
+from OptimizationProblem import *
 import matplotlib.pyplot as plt
-from QuasiNewton import*
+from Newton import *
+from QuasiNewton import *
 from linesearchmethods import inexact_linesearch
+from chebyquad_problem import *
+import scipy.optimize as opt
 
 
-def rosenbrock(x):
+def rosenbrock(x):  # optimal solution is (1,1)
     if len(x) != 2:
         raise ValueError("Rosenbrock takes arguments from R^2, not R^{}".format(len(x)))
         return
@@ -16,6 +19,13 @@ def rosenbrock(x):
 
 
 def contour_rosenbrock(levels=100, optipoints=array([])):
+    """
+    Plots the contours of the rosenbrock function, alternatively together with the optimization points
+    :param levels: (int) number of level curves we want to display
+    :param optipoints: (array)
+    :return: None
+    """
+
     # Verifying that 'optipoints' has the correct shape
     if optipoints.shape == (0,):
         pass
@@ -41,7 +51,7 @@ def contour_rosenbrock(levels=100, optipoints=array([])):
     plt.show()
 
 
-def function(x):
+def simple_function(x):
     value = 3*sin(x[0]) + sin(x[1])
     return value
 
@@ -62,11 +72,64 @@ def task7():
     method = QuasiNewton(problem)
     s = method.gradient(x)
     res = inexact_linesearch(rosenbrock, x, s, rho, sigma, tau, chi)
+    print(res)
 
 
-problem = OptimizationProblem(rosenbrock)
-solution = QuasiNewton(problem)
-min_point, min_value = solution.solve()
-print(min_point)
-optipoints = solution.values
-contour_rosenbrock(optipoints=optipoints)
+def newton_methods(problem=None):
+    """
+    Test Quasi Newton methods on the (optionally specified) 'problem'
+    :param problem:
+    :return:
+    """
+
+    # Let the user choose method
+    method = input("Testing Newton methods, choose one of the following:\n\t\'newton\', \'goodBroyden\', \'badBroyden\', \'symmetricBroyden\', \'DFP\', \'BFGS\'\nMethod: ")
+
+    # Check that the chosen method is valid
+    valid_methods = {"newton": Newton, "goodBroyden": GoodBroyden, "badBroyden": BadBroyden
+                        , "symmetricBroyden": SymmetricBroyden, "DFP": DFP, "BFGS": BFGS}
+    while method not in valid_methods:
+        print("\nMethod \'{}\' does not exist, choose one of the following:\n\t\'newton\', \'goodBroyden\', \'badBroyden\', \'symmetricBroyden\', \'DFP\', \'BFGS\'".format(method))
+        method = input("Method: ")
+
+    if not problem:  # if we didn't specify a problem we take the 'simple_function'
+        print("Using default problem")
+        problem = OptimizationProblem(simple_function)
+
+    # Choose linesearch method
+    lsm = input("\nChoose line search method:\t\'exact\' or \'inexact\'\nLSM: ")
+
+    # Create solver-instance
+    try:
+        solver = valid_methods[method](problem, lsm)
+    except ValueError:
+        lsm = input("\nLSM \'{}\' does not exist, choose between \'exact\' and \'inexact\'\nLSM: ".format(lsm))
+        solver = valid_methods[method](problem, lsm)
+
+    print("\nRunning {} method with {} line search".format(method, lsm))
+    min_point, min_value = solver.solve()
+    optipoints = solver.values
+    print("\nOptimal point:\n", min_point)
+    print("\nMinimum value:\n", min_value)
+    # contour_rosenbrock(optipoints=optipoints)  # uncomment to plot rosenbrock_contour and optimization points"""
+
+
+def chebyquadt():
+    problem = OptimizationProblem(chebyquad,dimension =4,lsm="inexact")
+    solution = BFGS(problem, lsm = "inexact")
+    a = solution.solve()
+
+    min2 = opt.fmin(chebyquad, ones((4, 1)) * 1)
+    print(min2)
+
+
+
+    print(a)
+
+
+
+def main():
+    chebyquadt()
+
+
+main()
