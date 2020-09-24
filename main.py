@@ -164,6 +164,7 @@ def HessianQualityControl():
     inverse_hessians = reshape(solution[0],[-1])
     allhess = empty(0)
     differences = empty(0)
+    k = 1
 
 
     #print(inverse_hessians)
@@ -183,12 +184,24 @@ def HessianQualityControl():
         #print()
 
         difference = testvalues-truevalues
-        differences = append(differences, difference)
+        print("k = " + str(k))
+        k +=1
+        print(difference)
+        differences = append(differences, mean(difference))
 
         inverse_hessians = inverse_hessians[4:-1]
         allhess = allhess[4:-1]
 
-    print(differences)
+
+
+
+    x = linspace(1,k-1,k-1)
+    plt.plot(x,differences)
+    plt.xlabel("k")
+    plt.ylabel("Mean difference between calculated and exact inverse Hessian")
+    plt.show()
+    #print(differences)
+    #print()
 
 def main():
     #newton_methods_test()
