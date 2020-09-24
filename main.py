@@ -148,9 +148,52 @@ def chebyquadtest():
     else:
         print("The two methods do NOT yield the same result.")
 
+def HessianQualityControl():
+
+    problem = OptimizationProblem()
+    solver = BFGS(problem, hessians= "on")
+    solution = solver.solve()
+    inverse_hessians = solution[0]
+
+    def true_hessian_inverse(x):
+        hessian = [1/(-3*sin(x[0])), 0, 0, 1/-sin(x[1])]
+        hessian = reshape(hessian,[-1])
+        return hessian
+
+    nmbr = size(solution[1])
+    inverse_hessians = reshape(solution[0],[-1])
+    allhess = empty(0)
+    differences = empty(0)
+
+
+    #print(inverse_hessians)
+
+    for i in range(0,nmbr,2):
+        coordinates = solution[1][i:i+2]
+        truehess = true_hessian_inverse(coordinates)
+        #print(truehess)
+        allhess = append(allhess,truehess)
+
+    while inverse_hessians.size > 1:
+        testvalues = inverse_hessians[0:4]
+        #print(testvalues)
+        #print()
+        truevalues = allhess[0:4]
+        #print(truevalues)
+        #print()
+
+        difference = testvalues-truevalues
+        differences = append(differences, difference)
+
+        inverse_hessians = inverse_hessians[4:-1]
+        allhess = allhess[4:-1]
+
+    print(differences)
+
 def main():
     #newton_methods_test()
-    chebyquadtest()
+    #chebyquadtest()
+    HessianQualityControl()
 
 
 main()

@@ -9,7 +9,7 @@ We refer to the Lecture03 slides when we write "section (X.Y)"
 
 class Newton:
 
-    def __init__(self, problem, lsm="inexact"):
+    def __init__(self, problem, lsm="inexact", hessians="off"):
         self.epsilon = 0.000001                       # step size for approximating derivatives
         self.f = problem.function                     # object function
         self.n = problem.dimension                    # the dimension of the domain, R^n
@@ -18,7 +18,10 @@ class Newton:
         self.TOL = 1.e-5                              # values under TOL are set to 0
         self.start = ones((self.n, 1)) * 4            # where we start our iteration/algorithm
         self.hessian = self.compute_hessian(self.start)   # current Hessian matrix (G)
-        self.inverted_hessian = linalg.inv(self.hessian)  # current inverted Hessian matrix (H)
+        self.inverted_hessian = linalg.inv(self.hessian) # current inverted Hessian matrix (H)
+        self.hessians = hessians
+        self.all_hessians = [self.inverted_hessian]
+        self.stepcoordinates = [self.start]
 
         if problem.gradient:
             self.gradient = problem.gradient
@@ -97,7 +100,15 @@ class Newton:
 
         s = self.step_direction(x)  # Newton/step direction
         new_coordinates = x + self.alpha * s
-        self.update_hessian(new_coordinates)
+
+        if self.hessians == "on":
+            print("GoingIn")
+            self.all_hessians = append(self.all_hessians, self.hessian)
+            self.update_hessian(new_coordinates)
+            self.all_hessians = append(self.all_hessians, self.hessian)
+
+        else:
+            self.update_hessian(new_coordinates)
         return new_coordinates
 
     def linesearch(self, x):
@@ -155,4 +166,8 @@ class Newton:
             value = newvalue
             solved = self.termination_criterion(value)
             self.values = hstack([self.values, value])
+        if self.hessians == "on":
+            return self.all_hessians, self.stepcoordinates
+
+
         return [value, self.f(value)]
