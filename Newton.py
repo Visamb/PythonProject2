@@ -10,13 +10,13 @@ We refer to the Lecture03 slides when we write "section (X.Y)"
 class Newton:
 
     def __init__(self, problem, lsm="inexact", hessians="off"):
-        self.epsilon = 0.000001                       # step size for approximating derivatives
+        self.epsilon = 0.001                       # step size for approximating derivatives
         self.f = problem.function                     # object function
         self.n = problem.dimension                    # the dimension of the domain, R^n
         self.alpha = 1                                # step size in the Newton Direction
         self.values = array([])                       # the values we obtain when iterating to the optimum solution
         self.TOL = 1.e-5                              # values under TOL are set to 0
-        self.start = ones((self.n, 1)) * 3.67            # where we start our iteration/algorithm
+        self.start = ones((self.n, 1)) * 3.6        # where we start our iteration/algorithm
         self.hessian = self.compute_hessian(self.start)   # current Hessian matrix (G)
         self.inverted_hessian = linalg.inv(self.hessian) # current inverted Hessian matrix (H)
         self.hessians = hessians
@@ -100,15 +100,7 @@ class Newton:
 
         s = self.step_direction(x)  # Newton/step direction
         new_coordinates = x + self.alpha * s
-
-        if self.hessians == "on":
-            print("GoingIn")
-            self.all_hessians = append(self.all_hessians, self.hessian)
-            self.update_hessian(new_coordinates)
-            self.all_hessians = append(self.all_hessians, self.hessian)
-
-        else:
-            self.update_hessian(new_coordinates)
+        self.update_hessian(new_coordinates)
         return new_coordinates
 
     def linesearch(self, x):

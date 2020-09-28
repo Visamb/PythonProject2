@@ -132,7 +132,7 @@ def chebyquadtest():
         method = input("Method: ")
 
     problem = OptimizationProblem(chebyquad,dimension =degree)
-    solver = valid_methods[method](problem, lsm = "inexact")
+    solver = valid_methods[method](problem, lsm = "exact")
     a = solver.solve()
 
     print()
@@ -175,6 +175,7 @@ def HessianQualityControl():
 
     for i in range(0,nmbr,2):
         coordinates = solution[1][i:i+2] #Coordinates of calculated hessians
+        print(coordinates)
         truehess = true_hessian_inverse(coordinates) #Calculating exact hessian
         allhess = append(allhess,truehess)
 
@@ -201,7 +202,7 @@ def HessianQualityControl():
 def main():
     #newton_methods_test()
     #chebyquadtest()
-    #HessianQualityControl()
+    HessianQualityControl()
 
 
 main()

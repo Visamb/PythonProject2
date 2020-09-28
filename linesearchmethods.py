@@ -36,14 +36,14 @@ def inexact_linesearch(f, x, s, rho, sigma, tau, chi):
     :return:
     """
     alpha_L = 0.
-    alpha_0 = 1.
+    alpha_0 = 8.
     alpha_U = 10**10
 
     def f_alpha(alpha):  # defined in section 3.6 Lecture03
         return f(x + alpha * s)
 
     def f_prim_alpha(alpha):
-        epsilon = 1.e-5
+        epsilon = 0.001
         n1 = f_alpha(alpha + epsilon)
         n2 = f_alpha(alpha - epsilon)
         res = (n1 - n2) / (2 * epsilon)
